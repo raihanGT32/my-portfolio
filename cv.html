@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Info</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+    }
+
+    #fireworksCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .message-box {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      max-width: 600px;
+      margin: 15% auto;
+      text-align: center;
+    }
+
+    h2 {
+      color: #2c3e50;
+    }
+    p {
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <!-- Fireworks Canvas -->
+  <canvas id="fireworksCanvas"></canvas>
+
+  <!-- Message -->
+  <div class="message-box">
+    <h2>Thank You for Clicking the Download CV Button!</h2>
+    <p>
+      I truly appreciate your interest. However, my CV is not ready yet, 
+      so I haven’t uploaded it here.  
+      This page is currently just a part of my class assignment.  
+    </p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("fireworksCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Firework {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.particles = [];
+        for (let i = 0; i < 100; i++) {
+          this.particles.push({
+            x: x,
+            y: y,
+            angle: Math.random() * 2 * Math.PI,
+            speed: Math.random() * 4 + 2,
+            alpha: 1,
+            decay: Math.random() * 0.02 + 0.01
+          });
+        }
+      }
+
+      update() {
+        this.particles.forEach(p => {
+          p.x += Math.cos(p.angle) * p.speed;
+          p.y += Math.sin(p.angle) * p.speed;
+          p.alpha -= p.decay;
+        });
+        this.particles = this.particles.filter(p => p.alpha > 0);
+      }
+
+      draw() {
+        this.particles.forEach(p => {
+          ctx.fillStyle = `rgba(${this.color},${p.alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+    }
+
+    let fireworks = [];
+    let fireworksActive = true;
+
+    function animate() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (fireworksActive) {
+        if (Math.random() < 0.1) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height * 0.5;
+          const color = `${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)}`;
+          fireworks.push(new Firework(x, y, color));
+        }
+      }
+
+      fireworks.forEach((f, i) => {
+        f.update();
+        f.draw();
+        if (f.particles.length === 0) fireworks.splice(i, 1);
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Stop fireworks after 10 seconds
+    setTimeout(() => {
+      fireworksActive = false;
+    }, 12000);
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
